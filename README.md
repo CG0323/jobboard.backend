@@ -67,10 +67,10 @@ This section records some key points (or lesson learned) in the implementation, 
 ###Code first database design
 This application has the following data models:  
 ![Data Model](img/datamodel.png)  
-*Job: Represent the core information of a job post.  
-*Content: Represent the raw text information of a job post (its job description and requirements)  
-*Skill: Represent a skill, such as `.NET`,`Java`, and its matching config (keywords based / regex based)  
-*JobSkill: Skill required by a specific job, and the required level of experience  
+* Job: Represent the core information of a job post.  
+* Content: Represent the raw text information of a job post (its job description and requirements)  
+* Skill: Represent a skill, such as `.NET`,`Java`, and its matching config (keywords based / regex based)  
+* JobSkill: Skill required by a specific job, and the required level of experience  
 
 User add __Skill__ along with the matching keywords/regex via frontend app.    
 The Jobboard.Scraper retrieve info from recruitment websites, post the __Job__ and __Content__ to this backend, 
