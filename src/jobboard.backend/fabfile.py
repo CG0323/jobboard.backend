@@ -5,7 +5,7 @@ from fabric.contrib.console import confirm
 import time
 
 # env.use_ssh_config = True
-env.hosts = ['60.205.216.128:5711']
+env.hosts = ['hostip:port']
 env.user = 'root'
 env.key_filename = 'C:\Users\mac\Documents\id_rsa_mopyfish'
 
