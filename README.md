@@ -3,7 +3,7 @@ A REST data service built with ASP.NET Core + EntityFramework Core + MySql
 
 ------
 ##Source Code Structure  
-
+```
 |-- src
     |-- jobboard.backend
     |   |-- appsettings.json
@@ -60,4 +60,5 @@ A REST data service built with ASP.NET Core + EntityFramework Core + MySql
         |   |-- Skill.cs
         |-- Properties
             |-- AssemblyInfo.cs
+```
 
