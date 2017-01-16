@@ -62,36 +62,38 @@ A REST data service built with ASP.NET Core + EntityFramework Core + MySql
 ```
 ##Implementation key points
 This section records some key points (or lesson learned) in the implementation, for future reference~
+
 -----------
 ###Code first database design
-
+TODO
 ####Handle multi to multi relation
-
+TODO
 ####Handle very long string datatable column
-
+TODO
 ####Generic repository pros & cons
-
+TODO
 ###Startup configuration
-
+TODO
 ####Enable CORS
-
+TODO
 ####Use a global exception handler
-
+TODO
 ####Specify EntityBaseRepository migration assembly
-
+TODO
 ####Configure Automapper mapping strategy
-
+TODO
 ##Deployment key points
 This section records some key points for deploying asp.net core on linux, for future reference~
+
 -----------
 ###Install .NET Core runtime
-
+TODO
 ###Start .Net Core Application
-
+TODO
 ###Configure Nginx as reverse proxy
-
+TODO
 ###Use supervisord to daemon the app server
-
+TODO
 ###Use Python Fabric to automate the deployment
-
+TODO
 
