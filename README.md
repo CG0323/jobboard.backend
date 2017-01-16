@@ -86,37 +86,85 @@ public ICollection<JobSkill> JobSkills { set; get; }
 In __JobSkill__
 ```C#
 public class JobSkill : IEntityBase
-    {
-        public int Id { set; get; }
-        public int JobId { set; get; }
-        public Job Job { set; get; }
-        public int SkillId {set;get;}
-        public Skill Skill { set; get; }
-        public int Level { set; get; }
-    }
+{
+    public int Id { set; get; }
+    public int JobId { set; get; }
+    public Job Job { set; get; }
+    public int SkillId {set;get;}
+    public Skill Skill { set; get; }
+    public int Level { set; get; }
+}
 ```
 The relations need to be specified in DbContext OnModelCreating():
 ```C#
 modelBuilder.Entity<Job>()
-               .HasMany(j => j.JobSkills)
-               .WithOne(js => js.Job)
-               .HasForeignKey(js => js.JobId);
+            .HasMany(j => j.JobSkills)
+            .WithOne(js => js.Job)
+            .HasForeignKey(js => js.JobId);
 
 modelBuilder.Entity<Skill>()
-                .HasMany(s => s.JobSkills)
-                .WithOne(js => js.Skill)
-                .HasForeignKey(js => js.SkillId);
+            .HasMany(s => s.JobSkills)
+            .WithOne(js => js.Skill)
+            .HasForeignKey(js => js.SkillId);
 ```
-####Handle very long string datatable column
-TODO
-####Generic repository pros & cons
-TODO
-###Startup configuration
-TODO
+####Handle very long string datatable column  
+The `Text` column in __Content__ is a very long string (detailed description of a job and its requirement), by default the `string` 
+in EF will be mapped to nvarchar in MySql, which is not enough. Strangely, even if I add `.HasMaxLength(100000)` it still does not map to MySql `text`.
+It works only after explicitely specify the column type:
+```C#
+modelBuilder.Entity<Content>()
+            .Property(c => c.Text)
+            .HasColumnType("text")
+            .HasMaxLength(100000)
+            .IsRequired();
+```
+###Startup configuration  
+In ASP.NET Core, essential configurations are in Startup.cs file, basically it does 2 important things there: 1. Register services for dependency injection 
+2. Configure HTTP pipeline  
+Below is some lesson learned / good practices  
 ####Enable CORS
-TODO
+Due to the separation of frontend and backend in this project, CORS must be enabled. To enable CORS in ASP.NET Core, 2 steps are needed:  
+```C#
+public void ConfigureServices(IServiceCollection services)
+{
+    ......
+    // Enable Cors
+    services.AddCors();
+    ......
+}
+```
+```C#
+public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+{
+    ......        
+    app.UseCors(builder =>
+                builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+    ......
+}
+```
 ####Use a global exception handler
-TODO
+Instead of polluting the code with try/catch blocks everywhere, in ASP.NET Core we could add a global Exception Handler into the pipeline.
+```C#
+app.UseExceptionHandler(
+    builder =>
+    {
+        builder.Run(
+            async context =>
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+
+                var error = context.Features.Get<IExceptionHandlerFeature>();
+                if (error != null)
+                {
+                    context.Response.AddApplicationError(error.Error.Message); 
+                    await context.Response.WriteAsync(error.Error.Message).ConfigureAwait(false);
+                }
+            });
+    });
+```
 ####Specify EntityBaseRepository migration assembly
 TODO
 ####Configure Automapper mapping strategy
