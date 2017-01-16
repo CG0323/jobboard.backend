@@ -77,11 +77,35 @@ The Jobboard.Scraper retrieve info from recruitment websites, post the __Job__ a
 then the backend trigger the Jobboard.Analyzer to extract __JobSkill__ from the Content and write to the database. 
 
 ####Handle mayny to many relation
-Many-to-many relationships without an entity class to represent the join table are not yet supported by EF Core. So a joining table engity is implemented
-as a bridge : __JobSkill__  
+Many-to-many relationships without an entity class to represent the join table are not yet supported by EF Core. So a joining table entity __JobSkill__
+is required as a bridge :   
 In both __Job__ and __Skill__, there is a navigation property:
 ```C#
 public ICollection<JobSkill> JobSkills { set; get; }
+```
+In __JobSkill__
+```C#
+public class JobSkill : IEntityBase
+    {
+        public int Id { set; get; }
+        public int JobId { set; get; }
+        public Job Job { set; get; }
+        public int SkillId {set;get;}
+        public Skill Skill { set; get; }
+        public int Level { set; get; }
+    }
+```
+The relations need to be specified in DbContext OnModelCreating():
+```C#
+modelBuilder.Entity<Job>()
+               .HasMany(j => j.JobSkills)
+               .WithOne(js => js.Job)
+               .HasForeignKey(js => js.JobId);
+
+modelBuilder.Entity<Skill>()
+                .HasMany(s => s.JobSkills)
+                .WithOne(js => js.Skill)
+                .HasForeignKey(js => js.SkillId);
 ```
 ####Handle very long string datatable column
 TODO
