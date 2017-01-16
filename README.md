@@ -65,9 +65,24 @@ This section records some key points (or lesson learned) in the implementation, 
 
 -----------
 ###Code first database design
-TODO
-####Handle multi to multi relation
-TODO
+This application has the following data models:
+![Data Model](img/datamodel.png)
+-Job: Represent the core information of a job post.  
+-Content: Represent the raw text information of a job post (its job description and requirements)
+-Skill: Represent a skill, such as `.NET`,`Java`, and its matching config (keywords based / regex based)
+-JobSkill: Skill required by a specific job, and the required level of experience
+
+User add __Skill__ along with the matching keywords/regex via frontend app.    
+The Jobboard.Scraper retrieve info from recruitment websites, post the __Job__ and __Content__ to this backend, 
+then the backend trigger the Jobboard.Analyzer to extract __JobSkill__ from the Content and write to the database. 
+
+####Handle mayny to many relation
+Many-to-many relationships without an entity class to represent the join table are not yet supported by EF Core. So a joining table engity is implemented
+as a bridge : __JobSkill__  
+In both __Job__ and __Skill__, there is a navigation property:
+```C#
+public ICollection<JobSkill> JobSkills { set; get; }
+```
 ####Handle very long string datatable column
 TODO
 ####Generic repository pros & cons
