@@ -166,19 +166,84 @@ app.UseExceptionHandler(
     });
 ```
 ####Specify EntityBaseRepository migration assembly
-TODO
+The EF `DbContext` and the app `Startup` are defined in different assemblies, 
+so if we run 
+```Bash
+dotnet ef migrations add init
+```
+It will fail, to make it work, it is mandatory to add the following configuration in Startup when register DbContext:
+```C#
+services.AddDbContext<JobBoardContext>(options =>
+    options.UseMySQL(Configuration["JobBoardConnection:ConnectionString"],
+    b => b.MigrationsAssembly("jobboard.backend"))
+    .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning)));
+```
 ####Configure Automapper mapping strategy
-TODO
+AutoMapper is used to convert between entity to dto (view model), a static configuring method is defined and called from the Startup:
+```C#
+public class AutoMappingConfiguration
+{
+    public static void Configure()
+    {
+        Mapper.Initialize(x =>
+        {
+            x.AddProfile<DomainToDtoMappingProfile>();
+            x.AddProfile<DtoToDomainModelMappingProfile>();
+        });
+    }
+}
+```
+```C# 
+public void ConfigureServices(IServiceCollection services)
+{
+    ......
+    AutoMappingConfiguration.Configure();
+    ......
+}
+```
 ##Deployment key points
 This section records some key points for deploying asp.net core on linux, for future reference~
 
 -----------
-###Install .NET Core runtime
-TODO
+###Install .NET Core runtime on linux server
+```Bash
+sudo yum install libunwind libicu
+curl -sSL -o dotnet.tar.gz https://go.microsoft.com/fwlink/?LinkID=836285
+sudo mkdir -p /opt/dotnet && sudo tar zxf dotnet.tar.gz -C /opt/dotnet
+sudo ln -s /opt/dotnet/dotnet /usr/local/bin
+```
+Note: the `836285` might need to be changed to reflect the version upgrade
+
 ###Start .Net Core Application
-TODO
+1. Build and publish the app to a folder
+2. Upload the folder to server
+3. On the server, cd the folder, then run:
+```Bash
+dotnet jobboard.backend.dll
+```
+The app will be started, be aware that at this point it can only be visited from localhost:5000 (the server itself) since 
+the integrated Kestrel server is not ready to be a full server yet~
+So we still need something like nginx to reverse proxy the http request
+
 ###Configure Nginx as reverse proxy
-TODO
+Add a Nginx configuration file:
+```Bash
+server {
+listen       8080;  //I use 8080 as the port for backend, since I deploy the frontend on the same server
+server_name localhost;
+
+access_log  /var/log/jobboard.backend.access.log;
+error_log  /var/log/jobboard.backend.error.log;
+location / {
+    proxy_pass  http://localhost:5000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection keep-alive;
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+    }
+}
+```
 ###Use supervisord to daemon the app server
 TODO
 ###Use Python Fabric to automate the deployment
