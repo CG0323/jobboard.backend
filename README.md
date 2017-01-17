@@ -6,12 +6,12 @@ A REST data service built with ASP.NET Core + EntityFramework Core + MySql
 * [Source code structure](#source-code-structure)
 * [Implementation key points](#implementation-key-points)
   + [Code first database design](#code-first-database-design)
-    - [Handle many to many relation](#handle-mayny-to-many-relation)
+    - [Handle many to many relation](#handle-many-to-many-relation)
     - [Handle very long string datatable column](#handle-very-long-string-datatable-column)
   + [Startup configuration](#startup-configuration)
     - [Enable CORS](#enable-cors)
     - [Use a global exception handler](#use-a-global-exception-handler)
-    - [Specify EntityBaseRepository migration assembly](#specify-entitybaserepository-migration-assembly)
+    - [Specify EntityFramework migration assembly](#specify-entityframework-migration-assembly)
     - [Configure Automapper mapping strategy](#configure-automapper-mapping-strategy)
 * [Deployment key points](#deployment-key-points)
   + [Install .NET Core runtime on linux server](#install-net-core-runtime-on-linux-server)
@@ -184,7 +184,7 @@ app.UseExceptionHandler(
             });
     });
 ```
-####Specify EntityBaseRepository migration assembly
+####Specify EntityFramework migration assembly
 The EF `DbContext` and the app `Startup` are defined in different assemblies, 
 so if we run 
 ```Bash
