@@ -6,7 +6,7 @@ A REST data service built with ASP.NET Core + EntityFramework Core + MySql
 * [Source code structure](#source-code-structure)
 * [Implementation key points](#implementation-key-points)
   + [Code first database design](#code-first-database-design)
-    - [Handle mayny to many relation](#handle-mayny-to-many-relation)
+    - [Handle many to many relation](#handle-mayny-to-many-relation)
     - [Handle very long string datatable column](#handle-very-long-string-datatable-column)
   + [Startup configuration](#startup-configuration)
     - [Enable CORS](#enable-cors)
@@ -95,7 +95,7 @@ User add __Skill__ along with the matching keywords/regex via frontend app.
 The Jobboard.Scraper retrieve info from recruitment websites, post the __Job__ and __Content__ to this backend, 
 then the backend trigger the Jobboard.Analyzer to extract __JobSkill__ from the Content and write to the database. 
 
-####Handle mayny to many relation
+####Handle many to many relation
 Many-to-many relationships without an entity class to represent the join table are not yet supported by EF Core. So a joining table entity __JobSkill__
 is required as a bridge :   
 In both __Job__ and __Skill__, there is a navigation property:
