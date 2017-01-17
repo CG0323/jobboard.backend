@@ -245,7 +245,97 @@ location / {
 }
 ```
 ###Use supervisord to daemon the app server
-TODO
+We want the backend always availible, no matter after reboot or program crash..., supervisord is the solution  
+```bash
+pip install supervisor
+mkdir /etc/supervisor
+echo_supervisord_conf > /etc/supervisor/supervisord.conf
+```
+modify the end of `supervisord.conf`
+```bash
+files = conf.d/*.conf
+```
+Creat a file called `jobboard.conf`:
+```bash
+[program:jobboard.backend]
+command=dotnet JobBoard.backend.dll
+directory=/home/cg/JobBoard.backend/ 
+autorestart=true 
+stderr_logfile=/var/log/JobBoard.backend.err.log 
+stdout_logfile=/var/log/JobBoard.backend.out.log  
+environment=ASPNETCORE_ENVIRONMENT=Production
+user=root 
+stopsignal=INT
+```
+Put this file to `/etc/supervisor/conf.d/jobboard.conf`  
+Run supervisord to see if it works:  
+```bash
+supervisord -c /etc/supervisor/supervisord.conf
+ps -ef | grep jobboard.backend
+```
+Then we want supervisord auto run on server startup  
+Create a file called `supervisord.service`:
+```bash
+[Unit]
+Description=Supervisor daemon
+[Service]
+Type=forking
+ExecStart=/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+ExecStop=/usr/bin/supervisorctl shutdown
+ExecReload=/usr/bin/supervisorctl reload
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+[Install]
+WantedBy=multi-user.target
+```
+Put this file to `/usr/lib/systemd/system/supervisord.service`  
+Configure auto start:
+```bash
+systemctl enable supervisord
+```
 ###Use Python Fabric to automate the deployment
-TODO
+Deploy .NET Core app manually is quite time consuming, and boring...  
+This project use Python Fabric to automate the deployment process.  
+Install Fabric:
+```bash
+pip install fabric
+```
+Create a `fabfile.py`:
+```Python
+from __future__ import with_statement
+from fabric.api import local, env, settings, abort, run, cd, lcd
+from fabric.contrib.console import confirm
+import time
+
+env.hosts = ['hostip:port']
+env.user = 'root'
+env.key_filename = 'path to rsa key file'
+
+def publish(): # build and put all publish files to a folder
+    local("iisreset /stop")
+    local("dotnet publish -o c:\Users\mac\jobboard.backend.publish")
+    local("iisreset /start")
+
+def push(): # the publish folder is also a git repository
+	with lcd('C:\Users\mac\jobboard.backend.publish'):
+		local("git add .")
+		with settings(warn_only=True):
+			local("git commit -m 'auto_update'")
+		local("git push")
+
+def update_server(): # server pull from git to update the publish package on server
+	with cd("/home/cg/jobboard.backend.publish"):
+		run('git pull') 
+		run('supervisorctl restart jobboard.backend')
+	
+def deploy():
+	publish()
+	push()
+	update_server()
+```
+So every time we want to deploy the app, simply:  
+```bash
+fab deploy
+```
 
