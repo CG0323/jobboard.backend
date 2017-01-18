@@ -1,5 +1,6 @@
 # jobboard.backend
-A REST data service built with ASP.NET Core + EntityFramework Core + MySql
+A REST data service built with ASP.NET Core + EntityFramework Core + MySql  
+Subsystem of the [__jobboard__](https://github.com/CG0323/jobboard) project
 
 ------
 ## Table of contents
