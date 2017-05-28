@@ -81,6 +81,7 @@ Subsystem of the [__jobboard__](https://github.com/CG0323/jobboard) project
             |-- AssemblyInfo.cs
 ```
 ##Implementation key points
+-----------
 This section records some key points (or lesson learned) in the implementation, for future reference~
 
 -----------
