@@ -144,10 +144,10 @@ modelBuilder.Entity<Content>()
             .IsRequired();
 ```
 ###Startup configuration   
-------------  
-In ASP.NET Core, essential configurations are in Startup.cs file, basically it does 2 important things there: 1. Register services for dependency injection 
-2. Configure HTTP pipeline  
+------------
+In ASP.NET Core, essential configurations are in Startup.cs file, basically it does 2 important things there: 1. Register services for dependency injection 2. Configure HTTP pipeline  
 Below is some lesson learned / good practices  
+
 ####Enable CORS   
 ------------
 Due to the separation of frontend and backend in this project, CORS must be enabled. To enable CORS in ASP.NET Core, 2 steps are needed:  
